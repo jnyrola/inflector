@@ -35,11 +35,14 @@ package org.jactiveresource;
 
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * a port of the excellent Inflector class in ruby's ActiveSupport library
+ * 
+ * Modified to be thread safe by jnyrola on 2012-12-17
  * 
  * @version $LastChangedRevision: 5 $ <br>
  *          $LastChangedDate: 2008-05-03 13:44:24 -0600 (Sat, 03 May 2008) $
@@ -152,7 +155,7 @@ public class Inflector {
         return out;
     }
 
-    public static void irregular( String singular, String plural ) {
+    private static void irregular( String singular, String plural ) {
         String regexp, repl;
 
         if ( singular.substring( 0, 1 ).toUpperCase().equals(
@@ -195,9 +198,9 @@ public class Inflector {
         }
     }
 
-    private static ArrayList<ReplacementRule> plurals;
-    private static ArrayList<ReplacementRule> singulars;
-    private static ArrayList<String> uncountables;
+    private static final List<ReplacementRule> plurals;
+    private static final List<ReplacementRule> singulars;
+    private static final List<String> uncountables;
 
     static {
         plurals = new ArrayList<ReplacementRule>( 17 );
