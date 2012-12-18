@@ -33,14 +33,12 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package org.jactiveresource;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ReplacementRule {
 
-    private Pattern p;
-    private Matcher m;
-    private String r;
+    private final Pattern p;
+    private final String r;
 
     public ReplacementRule( String regexp, String replacement ) {
         p = Pattern.compile( regexp );
@@ -48,12 +46,10 @@ public class ReplacementRule {
     }
 
     public boolean find( String word ) {
-        m = p.matcher( word );
-        return m.find();
+        return p.matcher( word ).find();
     }
 
     public String replace( String word ) {
-        m = p.matcher( word );
-        return m.replaceAll( this.r );
+        return p.matcher( word ).replaceAll( this.r );
     }
 }
