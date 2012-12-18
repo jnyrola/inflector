@@ -35,25 +35,21 @@ package org.jactiveresource;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.regex.Matcher;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
  * a port of the excellent Inflector class in ruby's ActiveSupport library
  * 
- * Modified to be thread safe by jnyrola on 2012-12-17
+ * Modified to be thread safe and more java-like by jnyrola on 2012-12-17
  * 
  * @version $LastChangedRevision: 5 $ <br>
  *          $LastChangedDate: 2008-05-03 13:44:24 -0600 (Sat, 03 May 2008) $
  * @author $LastChangedBy: jared $
  */
 public class Inflector {
-
-    public static String camelize( String word, boolean firstLetterInUppercase ) {
-
-        return null;
-    }
 
     private static Pattern underscorePattern = Pattern.compile( "_" );
 
@@ -64,8 +60,7 @@ public class Inflector {
      * @return
      */
     public static String dasherize( String word ) {
-        Matcher m = underscorePattern.matcher( word );
-        return m.replaceAll( "-" );
+        return underscorePattern.matcher( word ).replaceAll( "-" );
     }
 
     private static Pattern dashPattern = Pattern.compile( "-" );
@@ -77,8 +72,7 @@ public class Inflector {
      * @return
      */
     public static String underscorize( String word ) {
-        Matcher m = dashPattern.matcher( word );
-        return m.replaceAll( "_" );
+        return dashPattern.matcher( word ).replaceAll( "_" );
     }
 
     private static Pattern doubleColonPattern = Pattern.compile( "::" );
@@ -97,22 +91,12 @@ public class Inflector {
      * @return
      */
     public static String underscore( String word ) {
+        word = doubleColonPattern.matcher( word ).replaceAll( "/" );
+        word = underscore1Pattern.matcher( word ).replaceAll( "$1_$2" );
+        word = underscore2Pattern.matcher( word ).replaceAll( "$1_$2" );
+        word = underscorize( word );
 
-        String out;
-        Matcher m;
-
-        m = doubleColonPattern.matcher( word );
-        out = m.replaceAll( "/" );
-
-        m = underscore1Pattern.matcher( out );
-        out = m.replaceAll( "$1_$2" );
-
-        m = underscore2Pattern.matcher( out );
-        out = m.replaceAll( "$1_$2" );
-
-        out = underscorize( out );
-
-        return out.toLowerCase();
+        return word.toLowerCase();
     }
 
     /**
@@ -122,17 +106,15 @@ public class Inflector {
      * @return
      */
     public static String pluralize( String word ) {
-        String out = new String( word );
-        if ( ( out.length() == 0 )
+        if ( ( word.length() == 0 )
             || ( !uncountables.contains( word.toLowerCase() ) ) ) {
             for ( ReplacementRule r : plurals ) {
                 if ( r.find( word ) ) {
-                    out = r.replace( word );
-                    break;
+                    return r.replace( word );
                 }
             }
         }
-        return out;
+        return word;
     }
 
     /**
@@ -142,17 +124,15 @@ public class Inflector {
      * @return
      */
     public static String singularize( String word ) {
-        String out = new String( word );
-        if ( ( out.length() == 0 )
-            || ( !uncountables.contains( out.toLowerCase() ) ) ) {
+        if ( ( word.length() == 0 )
+            || ( !uncountables.contains( word.toLowerCase() ) ) ) {
             for ( ReplacementRule r : singulars ) {
                 if ( r.find( word ) ) {
-                    out = r.replace( word );
-                    break;
+                    return r.replace( word );
                 }
             }
         }
-        return out;
+        return word;
     }
 
     private static void irregular( String singular, String plural ) {
@@ -200,7 +180,7 @@ public class Inflector {
 
     private static final List<ReplacementRule> plurals;
     private static final List<ReplacementRule> singulars;
-    private static final List<String> uncountables;
+    private static final Set<String> uncountables;
 
     static {
         plurals = new ArrayList<ReplacementRule>( 17 );
@@ -258,7 +238,7 @@ public class Inflector {
         irregular( "move", "moves" );
         irregular( "cow", "kine" );
 
-        uncountables = new ArrayList<String>( 8 );
+        uncountables = new HashSet<String>( 8 );
         uncountables.add( "equipment" );
         uncountables.add( "information" );
         uncountables.add( "rice" );

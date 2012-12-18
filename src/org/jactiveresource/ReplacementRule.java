@@ -41,7 +41,7 @@ public class ReplacementRule {
     private final String r;
 
     public ReplacementRule( String regexp, String replacement ) {
-        p = Pattern.compile( regexp );
+        p = Pattern.compile( regexp, Pattern.CASE_INSENSITIVE );
         r = replacement;
     }
 
